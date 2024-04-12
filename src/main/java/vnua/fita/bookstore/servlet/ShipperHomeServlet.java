@@ -40,8 +40,22 @@ public class ShipperHomeServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String servletPath = req.getServletPath();
 		String pathInfo = MyUtil.getPathInfoFromServletPath(servletPath);
+		System.out.println("path: "+pathInfo);
 		String keyword = req.getParameter("keyword");
+		String context = req.getContextPath();
+		List<Order> orders = new ArrayList<Order>();
+		if (Constant.DELEVERING_ACTION.equals(pathInfo)) {
+			orders = orderDAO.getOrderList(Constant.DELEVERING_ORDER_STATUS, keyword, context);
+			req.setAttribute("listType", "ĐANG CHỜ GIAO");
+		} else if (Constant.DELEVERED_ACTION.equals(pathInfo)) {
+			orders = orderDAO.getOrderList(Constant.DELEVERED_ORDER_STATUS, keyword, context);
+			req.setAttribute("listType", "ĐÃ GIAO");
+		} else if (Constant.FAILURE_ACTION.equals(pathInfo)) {
+			orders = orderDAO.getOrderList(Constant.FAILURE_ORDER_STATUS, keyword, context);
+			req.setAttribute("listType", "BỊ HỎNG");
+		}
 		req.setAttribute("keyword", keyword);
+		req.setAttribute(Constant.ORDER_LIST_OF_CUSTOMER, orders);
 		RequestDispatcher dispatcher = this.getServletContext().getRequestDispatcher("/Views/shipperHomeView.jsp");
 		dispatcher.forward(req, resp);
 	}
@@ -71,7 +85,22 @@ public class ShipperHomeServlet extends HttpServlet {
 			if (Constant.DELEVERING_ORDER_STATUS == confirmType) {
 				updateResult = orderDAO.updateOrderNo(orderId, confirmType);
 			} else if (Constant.DELEVERED_ORDER_STATUS == confirmType) {
-				updateResult = orderDAO.updateOrder(orderId, confirmType);
+				Part filePart = req.getPart("file");
+				String fileName = UUID.randomUUID().toString() + "_" + MyUtil.getTimeLabel()
+						+ MyUtil.extracFileExtension(filePart);
+				String contextPath = getServletContext().getRealPath("/"); // Lấy đường dẫn thực của ứng dụng web
+				String savePath = contextPath + "failure-img-upload"; // Đường dẫn đến thư mục 'img'
+
+				File fileSaveDir = new File(savePath);
+				if (!fileSaveDir.exists()) {
+					fileSaveDir.mkdir(); // Tạo thư mục 'img' nếu nó không tồn tại
+				}
+
+				String filePath = savePath + File.separator + fileName; // Đường dẫn file cuối cùng để lưu trữ ảnh
+				filePart.write(filePath); // Lưu file ảnh
+				String imagePath = "failure-img-upload" + File.separator + fileName;
+
+				updateResult = orderDAO.updateOrder(orderId, confirmType, imagePath);
 			} else if (Constant.REJECT_ORDER_STATUS == confirmType) {
 				updateResult = orderDAO.updateOrder(orderId, confirmType);
 			} else if (Constant.FAILURE_ORDER_STATUS == confirmType) {
@@ -89,8 +118,8 @@ public class ShipperHomeServlet extends HttpServlet {
 				String filePath = savePath + File.separator + fileName; // Đường dẫn file cuối cùng để lưu trữ ảnh
 				filePart.write(filePath); // Lưu file ảnh
 				String imagePath = "failure-img-upload" + File.separator + fileName;
-				
-				updateResult = orderDAO.updateOrder(orderId, confirmType,imagePath);
+
+				updateResult = orderDAO.updateOrder(orderId, confirmType, imagePath);
 			}
 			if (updateResult) {
 				req.setAttribute("message", Constant.UPDATE_ORDER_SUCCESS);

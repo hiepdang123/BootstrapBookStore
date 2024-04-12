@@ -16,9 +16,10 @@
 	<jsp:include page="_menu_shipper.jsp"></jsp:include>
 	<div align="center">
 		<h3>DANH SÁCH ĐƠN HÀNG ${listType }</h3>
-		<input type="text" name="keyword" id="keyword"
-			placeholder="Tìm mã hóa đơn" />
-		<button id="searchButton">Tìm kiếm</button>
+
+		<input type="text" name="keyword" id="keyword" value="${keyword }"
+			placeholder="Tìm mã hóa đơn" onchange="searchOrder(this)" />
+
 		<form id="shipperOrderForm" method="POST" action=""
 			enctype="multipart/form-data">
 			<input type="hidden" name="orderId" id="orderIdOfAction" /> <input
@@ -27,7 +28,119 @@
 		</form>
 		<p style="color: red;">${errors }</p>
 		<p style="color: blue;">${message }</p>
-		<table border="1" id="data-container">
+		<table border="1">
+			<tr>
+				<th>Mã hóa đơn</th>
+				<th>Tên khách</th>
+				<th>Số điện thoại</th>
+				<th>Ngày đặt mua</th>
+				<th>Ngày xác nhận</th>
+				<th>Địa chỉ nhận sách</th>
+				<th>Phương thức thanh toán</th>
+				<th>Trạng thái đơn hàng</th>
+				<th>Thao tác</th>
+			</tr>
+			<tbody id="data-container">
+				<c:forEach items="${orderListOfCustomer }" var="orderOfCustomer">
+					<tr>
+						<td>${orderOfCustomer.orderNo}</td>
+						<td>${orderOfCustomer.customer.fullname}</td>
+						<td>${orderOfCustomer.customer.mobile}</td>
+						<td><fmt:formatDate value="${orderOfCustomer.orderDate }"
+								pattern="dd-MM-yyyy HH:mm" /></td>
+						<td><fmt:formatDate
+								value="${orderOfCustomer.orderApproveDate }"
+								pattern="dd-MM-yyyy HH:mm" /></td>
+						<td>${orderOfCustomer.deliveryAddress }</td>
+						<td>${orderOfCustomer.deliveryAddress}</td>
+						<td>${orderOfCustomer.paymentModeDescription}<c:if
+								test="${orderOfCustomer.paymentMode eq Constant.TRANSFER_PAYMENT_MODE}">
+								<br />
+								<button
+									onclick="document.getElementById('divImg${orderOfCustomer.orderId}').style.display='block'">Xem
+									chi tiết</button>
+								<button
+									onclick="document.getElementById('divImg${orderOfCustomer.orderId}').style.display='none'">Ẩn</button>
+								<div id="divImg${orderOfCustomer.orderId}"
+									style="display: none; padding-top: 5px;">
+									<img alt="Transfer Image"
+										src="${orderOfCustomer.paymentImagePath}" width="150" />
+								</div>
+							</c:if>
+						</td>
+						<td>${orderOfCustomer.orderStatusDescription}<c:if
+								test="${Constant.WAITING_CONFIRM_ORDER_STATUS ne orderOfCustomer.orderStatus}">
+            &nbsp;-&nbsp;${orderOfCustomer.paymentStatusDescription}
+        </c:if>
+						</td>
+						<td>
+							<button
+								onclick="document.getElementById('div${orderOfCustomer.orderId}').style.display='block'">Xem
+								chi tiết</button>
+							<button
+								onclick="document.getElementById('div${orderOfCustomer.orderId}').style.display='none'">Ẩn</button>
+							<div id="div${orderOfCustomer.orderId}" style="display: none;">
+								<h3>Các cuốn sách trong hóa đơn</h3>
+								<table border="1">
+									<tr style="background: yellow;">
+										<th>Tiêu đề</th>
+										<th>Tác giả</th>
+										<th>Giá tiền</th>
+										<th>Số lượng mua</th>
+										<th>Tổng thành phần</th>
+									</tr>
+									<c:forEach items="${orderOfCustomer.orderBookList}"
+										var="cartItem">
+										<tr>
+											<td>${cartItem.selectedBook.title}</td>
+											<td>${cartItem.selectedBook.author}</td>
+											<td>${cartItem.selectedBook.price}<sup>đ</sup></td>
+											<td>${cartItem.quantity}</td>
+											<td>${cartItem.selectedBook.price * cartItem.quantity}<sup>đ</sup></td>
+										</tr>
+									</c:forEach>
+								</table>
+								<br />Tổng số tiền: <b>${orderOfCustomer.totalCost}<sup>đ</sup></b>
+								<c:if
+									test="${Constant.WAITING_CONFIRM_ORDER_STATUS eq orderOfCustomer.orderStatus}">
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <button
+										onclick="onClickAdminOrderConfirm(${orderOfCustomer.orderId},${Constant.DELEVERING_ORDER_STATUS},'${Constant.WAITING_APPROVE_ACTION}')">Xác
+										nhận đơn</button>
+								</c:if>
+								<c:if
+									test="${Constant.DELEVERING_ORDER_STATUS eq orderOfCustomer.orderStatus}">
+									<br />
+									<br />
+									<img alt="" src="" id="bookImage${orderOfCustomer.orderId}"
+										width="150">&nbsp;
+                <input type="file" name="file" accept="image/*"
+										onchange="loadImageFailure(event,'bookImage${orderOfCustomer.orderId}')" />
+									<br />
+									<button
+										onclick="onClickAdminOrderConfirm(${orderOfCustomer.orderId},${Constant.DELEVERED_ORDER_STATUS},'${Constant.DELEVERING_ACTION}')">Xác
+										nhận đã giao đơn hàng</button>
+									<button
+										onclick="onClickAdminOrderConfirm(${orderOfCustomer.orderId},${Constant.FAILURE_ORDER_STATUS},'${Constant.FAILURE_ACTION}')">Xác
+										nhận khách trả hàng</button>
+								</c:if>
+								<c:if
+									test="${Constant.FAILURE_ORDER_STATUS eq orderOfCustomer.orderStatus}">
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <img src="${orderOfCustomer.failureImagePath}"
+										width="150" height="150" />
+								</c:if>
+								<c:if
+									test="${Constant.DELEVERED_ORDER_STATUS eq orderOfCustomer.orderStatus}">
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <img src="${orderOfCustomer.failureImagePath}"
+										width="150" height="150" />
+								</c:if>
+							</div>
+						</td>
+					</tr>
+				</c:forEach>
+			</tbody>
 		</table>
 	</div>
 	<jsp:include page="_footer.jsp"></jsp:include>
@@ -64,145 +177,26 @@
 	    document.getElementById("fileImage").files = event.target.files;
 	}
 	
-	</script>
-	<script type="text/javascript">
-	const getListOrder = (url) => {
-	    return fetch(url)
-	        .then(response => response.json())
-	        .then(data => {
-	            // Xử lý dữ liệu trả về từ API (data.data)
-	            return data.data;
-	        });
-	};
-	
-	const Constant = {
-		    TRANSFER_PAYMENT_MODE: 'transfer',
-		    WAITING_CONFIRM_ORDER_STATUS: 1,
-		    DELEVERING_ORDER_STATUS: 2,
-		    DELEVERED_ORDER_STATUS: 3,
-		    FAILURE_ORDER_STATUS: 7,
-		    WAITING_APPROVE_ACTION: 'waiting',
-		    DELEVERING_ACTION: 'delivering',
-		    FAILURE_ACTION: 'failure'
-		};
-	
-	const renderData = (orders) => {
+	function searchOrder(element) {
+		let keyword=element.value;
+		getOrder(keyword);
 		const table = document.getElementById("data-container");  
-		let html = "\
-		    <tr>\
-		        <th>Mã hóa đơn</th>\
-		        <th>Tên khách</th>\
-		        <th>Số điện thoại</th>\
-		        <th>Ngày đặt mua</th>\
-		        <th>Ngày xác nhận</th>\
-		        <th>Địa chỉ nhận sách</th>\
-		        <th>Phương thức thanh toán</th>\
-		        <th>Trạng thái đơn hàng</th>\
-		        <th>Thao tác</th>\
-		    </tr>\
-		";
-		orders.forEach(orderOfCustomer => {
-		    // Định dạng ngày tháng từ timestamp
-		    const orderDate = new Date(orderOfCustomer.orderDate);
-		    const formattedOrderDate = orderDate.getDate() + '-' + (orderDate.getMonth() + 1) + '-' + orderDate.getFullYear() + ' ' + orderDate.getHours() + ':' + orderDate.getMinutes();
-
-		    const approveDate = new Date(orderOfCustomer.orderApproveDate);
-		    const formattedApproveDate = approveDate.getDate() + '-' + (approveDate.getMonth() + 1) + '-' + approveDate.getFullYear() + ' ' + approveDate.getHours() + ':' + approveDate.getMinutes();
-		    
-		    html += "\
-		        <tr>\
-		            <td>" + orderOfCustomer.orderNo + "</td>\
-		            <td>" + orderOfCustomer.customer.fullname + "</td>\
-		            <td>" + orderOfCustomer.customer.mobile + "</td>\
-		            <td>" + formattedOrderDate + "</td>\
-		            <td>" + formattedApproveDate + "</td>\
-		            <td>" + orderOfCustomer.deliveryAddress + "</td>\
-		            <td>" + orderOfCustomer.paymentModeDescription;
-		    if (orderOfCustomer.paymentMode === Constant.TRANSFER_PAYMENT_MODE) {
-		        html += "\
-		                <br/>\
-		                <button onclick=\"document.getElementById('divImg" + orderOfCustomer.orderId + "').style.display='block'\">Xem chi tiết</button>\
-		                <button onclick=\"document.getElementById('divImg" + orderOfCustomer.orderId + "').style.display='none'\">Ẩn</button>\
-		                <div id=\"divImg" + orderOfCustomer.orderId + "\" style=\"display: none; padding-top: 5px;\">\
-		                    <img alt=\"Transfer Image\" src=\"" + orderOfCustomer.paymentImagePath + "\" width=\"150\"/>\
-		                </div>";
-		    }
-		    html += "\
-		            </td>\
-		            <td>" + orderOfCustomer.orderStatusDescription;
-		    if (Constant.WAITING_CONFIRM_ORDER_STATUS !== orderOfCustomer.orderStatus) {
-		        html += "&nbsp;-&nbsp;" + orderOfCustomer.paymentStatusDescription;
-		    }
-		    html += "\
-		            </td>\
-		            <td>\
-		                <button onclick=\"document.getElementById('div" + orderOfCustomer.orderId + "').style.display='block'\">Xem chi tiết</button>\
-		                <button onclick=\"document.getElementById('div" + orderOfCustomer.orderId + "').style.display='none'\">Ẩn</button>\
-		                <div id=\"div" + orderOfCustomer.orderId + "\" style=\"display: none;\">\
-		                    <h3>Các cuốn sách trong hóa đơn</h3>\
-		                    <table border=\"1\">\
-		                        <tr style=\"background: yellow;\">\
-		                            <th>Tiêu đề</th>\
-		                            <th>Tác giả</th>\
-		                            <th>Giá tiền</th>\
-		                            <th>Số lượng mua</th>\
-		                            <th>Tổng thành phần</th>\
-		                        </tr>";
-		    orderOfCustomer.orderBookList.forEach(cartItem => {
-		        html += "\
-		            <tr>\
-		                <td>" + cartItem.selectedBook.title + "</td>\
-		                <td>" + cartItem.selectedBook.author + "</td>\
-		                <td>" + cartItem.selectedBook.price + "<sup>đ</sup></td>\
-		                <td>" + cartItem.quantity + "</td>\
-		                <td>" + (cartItem.selectedBook.price * cartItem.quantity) + "<sup>đ</sup></td>\
-		            </tr>";
-		    });
-		    html += "\
-		                    </table>\
-		                    <br/>Tổng số tiền: <b>" + orderOfCustomer.totalCost + "<sup>đ</sup></b>";
-		    if (Constant.WAITING_CONFIRM_ORDER_STATUS === orderOfCustomer.orderStatus) {
-		        html += "&nbsp;&nbsp;&nbsp;&nbsp;\
-		                <button onclick=\"onClickAdminOrderConfirm(" + orderOfCustomer.orderId + "," + Constant.DELEVERING_ORDER_STATUS + ",'" + Constant.WAITING_APPROVE_ACTION + "')\">Xác nhận đơn</button>";
-		    } 
-		    console.log(Constant.DELEVERING_ORDER_STATUS === orderOfCustomer.orderStatus," - ",orderOfCustomer.orderStatus," - ",Constant.DELEVERING_ORDER_STATUS)
- 			if (Constant.DELEVERING_ORDER_STATUS === orderOfCustomer.orderStatus) {
-		        html += "<br/><br/>\
-		                <img alt=\"\" src=\"\" id=\"bookImage" + orderOfCustomer.orderId + "\" width=\"150\">&nbsp;\
-		                <input type=\"file\" name=\"file\" accept=\"image/*\" onchange=\"loadImageFailure(event,'bookImage" + orderOfCustomer.orderId + "')\"/>\
-		                <br/>\
-		                <button onclick=\"onClickAdminOrderConfirm(" + orderOfCustomer.orderId + "," + Constant.DELEVERED_ORDER_STATUS + ",'" + Constant.DELEVERING_ACTION + "')\">Xác nhận đã giao đơn hàng</button>\
-		                <button onclick=\"onClickAdminOrderConfirm(" + orderOfCustomer.orderId + "," + Constant.FAILURE_ORDER_STATUS + ",'" + Constant.FAILURE_ACTION + "')\">Xác nhận khách trả hàng</button>";
-		    } 
-			if (Constant.FAILURE_ORDER_STATUS === orderOfCustomer.orderStatus) {
-		        html += "&nbsp;&nbsp;&nbsp;&nbsp;\
-		                <img src=\"" + orderOfCustomer.failureImagePath + "\" width=\"150\" height=\"150\"/>";
-		    }
-		    html += "\
-		                </div>\
-		            </td>\
-		        </tr>";
-		});
-		table.innerHTML = html;
-
 	}
-	var lastPart="";
-	var keyword="";
-	window.onload = async()=> {
-	    var url = window.location.href;
-	    var parts = url.split("/");
-	    lastPart = parts[parts.length - 1];
-	    
-	    let order = await getListOrder("http://localhost:8082/ShipperBookStore/api/order?status=" + lastPart);
-	    renderData(order)
-	};
-	const button = document.getElementById("searchButton"); 
-	button.addEventListener("click", async() => {
-		const keywordInput = document.getElementById("keyword"); 
-		const keyword = keywordInput.value.trim();
-		let order = await getListOrder("http://localhost:8082/ShipperBookStore/api/order?status="+ lastPart+"&keyword="+keyword);
-		renderData(order)
-	})
+	
+	function searchOrder(element) {
+	    let keyword = element.value.toLowerCase(); // Chuyển đổi keyword thành chữ thường để so sánh không phân biệt hoa thường
+	    const orders = document.querySelectorAll('#data-container tr'); // Lấy danh sách tất cả các hàng trong bảng
+
+	    orders.forEach(order => {
+	        let orderNo = order.cells[0].innerText.toLowerCase(); // Lấy mã hóa đơn từ cột đầu tiên của hàng
+	        if (orderNo.includes(keyword)) { // Kiểm tra xem mã hóa đơn có chứa keyword không
+	            order.style.display = ''; // Hiển thị hàng nếu chứa keyword
+	        } else {
+	            order.style.display = 'none'; // Ẩn hàng nếu không chứa keyword
+	        }
+	    });
+	}
+	
 	</script>
 </body>
 </html>
