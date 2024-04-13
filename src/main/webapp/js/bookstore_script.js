@@ -147,3 +147,63 @@ for (var i = 0; i < btns.length; i++) {
   this.className += " active";
   });
 }
+
+	function getInfoTable() {
+		if (request.readyState == 4) {
+			var val = request.responseText;
+			document.getElementById('data-container').innerHTML = val;
+		}
+	}
+	
+	function searchOrder(element) {
+	    let keyword = element.value; // Chuyển đổi keyword thành chữ thường để so sánh không phân biệt hoa thường
+		var url = window.location.pathname + '?keyword=' + keyword;
+	    console.log("url: ",url)
+        
+        // Thay đổi URL mà không tải lại trang
+        history.pushState({}, '', url);
+        if (window.XMLHttpRequest) {
+			request = new XMLHttpRequest();
+		} else if (window.ActiveXObject) {
+			request = new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		try {
+			request.onreadystatechange = getInfoTable;
+			request.open("GET", url, true);
+			request.send();
+		} catch (e) {
+			alert("Unable to connect to server");
+		}
+	}
+	
+		function onClickAdminOrderConfirm(orderId, confirmType, action) {
+	    var form = document.getElementById("shipperOrderForm");
+	    
+	    // Gán giá trị orderId và confirmType vào các input hidden trong form
+	    document.getElementById("orderIdOfAction").value = orderId;
+	    document.getElementById("confirmTypeOfAction").value = confirmType;
+	    
+	    // Lấy ra input chứa file
+	    var fileInput = document.getElementById("fileImage");
+	    
+	    // Kiểm tra xem có file đã được chọn chưa
+	    if (fileInput.files.length > 0) {
+	        // Gán file đã chọn vào form
+	        form.append("file", fileInput.files[0]);
+	    }
+	    
+	    // Gán giá trị action cho form
+	    form.action = action;
+	    
+	    // Gửi form đi
+	    form.submit();
+	}
+
+	function loadImageFailure(event,id) {
+	    let output = document.getElementById(id);
+	    output.src = URL.createObjectURL(event.target.files[0]);
+	    output.onload = function() {
+	        URL.revokeObjectURL(output.src)
+	    }
+	    document.getElementById("fileImage").files = event.target.files;
+	}
