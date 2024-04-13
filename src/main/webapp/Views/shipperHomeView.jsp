@@ -18,7 +18,7 @@
 		<h3>DANH SÁCH ĐƠN HÀNG ${listType }</h3>
 
 		<input type="text" name="keyword" id="keyword" value="${keyword }"
-			placeholder="Tìm mã hóa đơn" onchange="searchOrder(this)" />
+			placeholder="Tìm mã hóa đơn" onkeyup="searchOrder(this)" />
 
 		<form id="shipperOrderForm" method="POST" action=""
 			enctype="multipart/form-data">
@@ -145,58 +145,90 @@
 	</div>
 	<jsp:include page="_footer.jsp"></jsp:include>
 	<script type="text/javascript">
-	function onClickAdminOrderConfirm(orderId, confirmType, action) {
-	    var form = document.getElementById("shipperOrderForm");
-	    
-	    // Gán giá trị orderId và confirmType vào các input hidden trong form
-	    document.getElementById("orderIdOfAction").value = orderId;
-	    document.getElementById("confirmTypeOfAction").value = confirmType;
-	    
-	    // Lấy ra input chứa file
-	    var fileInput = document.getElementById("fileImage");
-	    
-	    // Kiểm tra xem có file đã được chọn chưa
-	    if (fileInput.files.length > 0) {
-	        // Gán file đã chọn vào form
-	        form.append("file", fileInput.files[0]);
-	    }
-	    
-	    // Gán giá trị action cho form
-	    form.action = action;
-	    
-	    // Gửi form đi
-	    form.submit();
-	}
+    function onClickAdminOrderConfirm(orderId, confirmType, action) {
+        var form = document.getElementById("shipperOrderForm");
+        
+        // Gán giá trị orderId và confirmType vào các input hidden trong form
+        document.getElementById("orderIdOfAction").value = orderId;
+        document.getElementById("confirmTypeOfAction").value = confirmType;
+        
+        // Lấy ra input chứa file
+        var fileInput = document.getElementById("fileImage");
+        
+        // Kiểm tra xem có file đã được chọn chưa
+        if (fileInput.files.length > 0) {
+            // Gán file đã chọn vào form
+            form.append("file", fileInput.files[0]);
+        }
+        
+        // Gán giá trị action cho form
+        form.action = action;
+        
+        // Gửi form đi
+        form.submit();
+    }
 
-	function loadImageFailure(event,id) {
-	    let output = document.getElementById(id);
-	    output.src = URL.createObjectURL(event.target.files[0]);
-	    output.onload = function() {
-	        URL.revokeObjectURL(output.src)
-	    }
-	    document.getElementById("fileImage").files = event.target.files;
-	}
-	
-	function searchOrder(element) {
-		let keyword=element.value;
-		getOrder(keyword);
-		const table = document.getElementById("data-container");  
-	}
-	
-	function searchOrder(element) {
-	    let keyword = element.value.toLowerCase(); // Chuyển đổi keyword thành chữ thường để so sánh không phân biệt hoa thường
-	    const orders = document.querySelectorAll('#data-container tr'); // Lấy danh sách tất cả các hàng trong bảng
+    function loadImageFailure(event, id) {
+        let output = document.getElementById(id);
+        output.src = URL.createObjectURL(event.target.files[0]);
+        output.onload = function() {
+            URL.revokeObjectURL(output.src)
+        }
+        document.getElementById("fileImage").files = event.target.files;
+    }
 
-	    orders.forEach(order => {
-	        let orderNo = order.cells[0].innerText.toLowerCase(); // Lấy mã hóa đơn từ cột đầu tiên của hàng
-	        if (orderNo.includes(keyword)) { // Kiểm tra xem mã hóa đơn có chứa keyword không
-	            order.style.display = ''; // Hiển thị hàng nếu chứa keyword
-	        } else {
-	            order.style.display = 'none'; // Ẩn hàng nếu không chứa keyword
-	        }
-	    });
-	}
-	
-	</script>
+    function searchOrder(element) {
+        let keyword = element.value.toLowerCase(); // Chuyển đổi keyword thành chữ thường để so sánh không phân biệt hoa thường
+        const orders = document.querySelectorAll('#data-container tr'); // Lấy danh sách tất cả các hàng trong bảng
+
+        orders.forEach(order => {
+            let orderNo = order.cells[0].innerText.toLowerCase(); // Lấy mã hóa đơn từ cột đầu tiên của hàng
+            if (orderNo.includes(keyword)) { // Kiểm tra xem mã hóa đơn có chứa keyword không
+                order.style.display = ''; // Hiển thị hàng nếu chứa keyword
+            } else {
+                order.style.display = 'none'; // Ẩn hàng nếu không chứa keyword
+            }
+        });
+    }
+
+    function getOrder(keyword) {
+        //url này sẽ gọi đến servlet hiện tại (ShipperHomeServlet) với tham số kèm theo
+        var url = window.location.href + "?keyword=" + keyword;
+        if (window.XMLHttpRequest) {
+            request = new XMLHttpRequest();
+        } else if (window.ActiveXObject) {
+            request = new ActiveXObject("Microsoft.XMLHTTP")
+        }
+        try {
+            request.onreadystatechange = getInfo;
+            request.open("GET", url, true);
+            request.send();
+        } catch (e) {
+            alert("Unable to connect to server");
+        }
+    }
+
+    function getInfo() {
+        if (request.readyState === XMLHttpRequest.DONE) {
+            if (request.status === 200) {
+                // Phản hồi từ máy chủ đã được nhận và thành công
+                var responseData = request.responseText;
+                // Cập nhật lại các tr mới
+                updateOrderList(responseData);
+            } else {
+                // Xử lý khi nhận được phản hồi với mã lỗi từ máy chủ
+                console.error("Lỗi khi nhận phản hồi từ máy chủ:", request.status);
+            }
+        }
+    }
+
+    function updateOrderList(responseData) {
+        var dataContainer = document.getElementById("data-container");
+        // Xóa các tr cũ trong dataContainer
+        dataContainer.innerHTML = "";
+        // Thêm các tr mới từ dữ liệu phản hồi vào dataContainer
+        dataContainer.innerHTML = responseData;
+    }
+</script>
 </body>
 </html>

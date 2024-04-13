@@ -40,7 +40,6 @@ public class ShipperHomeServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String servletPath = req.getServletPath();
 		String pathInfo = MyUtil.getPathInfoFromServletPath(servletPath);
-		System.out.println("path: "+pathInfo);
 		String keyword = req.getParameter("keyword");
 		String context = req.getContextPath();
 		List<Order> orders = new ArrayList<Order>();
