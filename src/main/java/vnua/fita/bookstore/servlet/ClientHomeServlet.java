@@ -59,7 +59,7 @@ public class ClientHomeServlet extends HttpServlet {
 
 		List<Book> list = null;
 		int page = 1;
-		int recordsPerPage = 2;
+		int recordsPerPage = 6;
 		if (request.getParameter("page") != null) {
 			page = Integer.parseInt(request.getParameter("page"));
 		}

@@ -6,91 +6,95 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/bookstore_style.css">
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <title>Website Cửa Hàng Sách</title>
 </head>
 <body>
 	<jsp:include page="_header.jsp"></jsp:include>
 	<jsp:include page="_menu.jsp"></jsp:include>
-	<div align="center">
-		<h3>Danh sách các cuốn sách</h3>
-		<p style="color: red;">${errors }</p>
-		<c:if test="${keyword!=null }">
-			<p>Tôi đang tìm kiếm ${keyword }</p>
-		</c:if>
-		<table border="1">
-			<tr>
-				<th>Tiêu đề</th>
-				<th>Tác giả</th>
-				<th>Giá tiền</th>
-				<th>Số lượng sẵn có</th>
-				<th>Thao tác</th>
-			</tr>
-			<c:forEach items="${bookList}" var="book">
-				<tr>
-					<td>${book.title}</td>
-					<td>${book.author}</td>
-					<td><fmt:setLocale value="en_US" /> <fmt:formatNumber
-							type="number" value="${book.price }" /><sup>đ</sup></td>
-					<td align="center">${book.quantityInStock }</td>
-					<!-- gọi đến servlet có tên liên kết detailBook, truyền thông tin bookId
-					 để xem thông tin chi tiết cuốn sách -->
+	<div class="row">
+		<jsp:include page="_left_sidebar.jsp"></jsp:include>
 
-					<td align="center"><button type="button"
-							onclick="activeAsLink('detailBook?bookId=${book.bookId}')">Xem
-							chi tiết</button></td>
-				</tr>
-			</c:forEach>
-		</table>
+		<div class="rightcolumn">
+			<div class="block home_book" id="searchResult">
+				<c:forEach items="${bookList}" var="book">
 
-		<!-- không có hoạt động tìm kiếm -->
-		<c:if test="${empty keyword }">
-			<div style="margin-top: 5px">
-				<!-- link previous chỉ xuất hiện khi trang hiện tại lớn hơn 1 -->
-				<c:if test="${currentPage gt 1 }">
-					<a href="clientHome?page=${currentPage - 1} ">Previous</a> &nbsp;
+					<div class="item_content">
+						<img id="bookImage" alt="" src="${book.imagePath}" height="200px"
+							style="max-width: 100%">
+						<p style="height: 30px; margin: 5px;">
+							<b>"${book.title}"</b>
+						</p>
+						<hr>
+						<p style="margin: 5px;">
+							<fmt:formatNumber type="number" maxFractionDigits="0"
+								value="${book.price}" />
+							<sup>đ</sup> &nbsp;&nbsp; <a
+								href="detailBook?bookId=${book.bookId}">Xem chi tiết</a>
+						</p>
+
+
+					</div>
+				</c:forEach>
+				<p style="color: red;">${errors}</p>
+				<div class="block" align="center">
+					<c:if test="${empty keyword }">
+						<div style="margin-top: 5px">
+							<!-- link previous chỉ xuất hiện khi trang hiện tại lớn hơn 1 -->
+							<c:if test="${currentPage gt 1 }">
+								<a href="clientHome?page=${currentPage - 1} ">Previous</a> &nbsp;
 				</c:if>
-				<c:forEach begin="1" end="${noOfPages }" var="i">
-					<c:choose>
-						<c:when test="${currentPage eq i}"> <!-- Trùng lặp trang hiện tại thì không tạo link -->
+							<c:forEach begin="1" end="${noOfPages }" var="i">
+								<c:choose>
+									<c:when test="${currentPage eq i}">
+										<!-- Trùng lặp trang hiện tại thì không tạo link -->
 							&nbsp;${i}&nbsp;
 						</c:when>
-						<c:otherwise>
+									<c:otherwise>
 							&nbsp;<a href="clientHome?page=${i}">${i}</a>&nbsp;
 						</c:otherwise>
-					</c:choose>
-				</c:forEach>
+								</c:choose>
+							</c:forEach>
 
-				<!-- Link Next chỉ xuất hiện khi trang hiện tại nhỏ hơn tổng số trang -->
-				<c:if test="${currentPage lt noOfPages }">
+							<!-- Link Next chỉ xuất hiện khi trang hiện tại nhỏ hơn tổng số trang -->
+							<c:if test="${currentPage lt noOfPages }">
 					&nbsp;<a href="clientHome?page=${currentPage + 1}">Next</a>
-				</c:if>
-			</div>
-		</c:if>
+							</c:if>
+						</div>
+					</c:if>
 
-		<!-- có hoạt động tìm kiếm, thêm tham số keyword -->
-		<c:if test="${not empty keyword }">
-			<div style="margin-top: 5px">
-				<c:if test="${currentPage gt 1}">
-					<a href="clientHome?page=${currentPage - 1}&keyword=${keyword}">Previous</a>&nbsp;
+					<!-- có hoạt động tìm kiếm, thêm tham số keyword -->
+					<c:if test="${not empty keyword }">
+						<div style="margin-top: 5px">
+							<c:if test="${currentPage gt 1}">
+								<a href="clientHome?page=${currentPage - 1}&keyword=${keyword}">Previous</a>&nbsp;
 				</c:if>
-				<c:forEach begin="1" end="${noOfPages }" var="i">
-					<c:choose>
-						<c:when test="${currentPage eq i}">
+							<c:forEach begin="1" end="${noOfPages }" var="i">
+								<c:choose>
+									<c:when test="${currentPage eq i}">
 							&nbsp;${i}&nbsp;
 						</c:when>
-						<c:otherwise>
+									<c:otherwise>
 							&nbsp;<a href="clientHome?page=${i}&keyword=${keyword}">${i}</a>&nbsp;
 						</c:otherwise>
-					</c:choose>
-				</c:forEach>
-				<c:if test="${currentPage lt noOfPages }">
+								</c:choose>
+							</c:forEach>
+							<c:if test="${currentPage lt noOfPages }">
 					&nbsp;<a
-						href="clientHome?page=${currentPage + 1}&keyword=${keyword}">Next</a>
-				</c:if>
+									href="clientHome?page=${currentPage + 1}&keyword=${keyword}">Next</a>
+							</c:if>
+						</div>
+					</c:if>
+
+				</div>
+
 			</div>
-		</c:if>
+
+		</div>
 	</div>
+
+	<jsp:include page="_footer.jsp"></jsp:include>
 </body>
 </html>

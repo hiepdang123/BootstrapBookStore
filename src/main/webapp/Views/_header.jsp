@@ -3,35 +3,37 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <script type="text/javascript"
 	src="${pageContext.request.contextPath}/js/bookstore_script.js"></script>
-<div style="background: #E0E0E0; height: 75px; padding: 15px">
-	<div style="float: left">
-		<h2>Website Cửa hàng Sách với JSP/Servlet</h2>
-	</div>
-	<div style="float: right; text-align: right;">
+
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath }/css/style.css">
+<div class="header" >
+	<img onclick="activeAsLink('${pageContext.request.contextPath}/clientHome');" class="header_left" alt="" src="${pageContext.request.contextPath}/img/bookstore-logo.svg)">
+		<h1>Website Cửa hàng Sách với JSP/Servlet</h1>
+	
+	<div class="header_right" style="float: right; text-align: right;">
 		<c:if test="${not empty loginedUser }">
 			Xin chào: <b> ${loginedUser.fullname} </b>
 			|
 			<a href="${pageContext.request.contextPath}/accountInfo">Thông
 				tin tài khoản</a>
 			|
-			<a href="${pageContext.request.contextPath}/customerOrderList">Thông
+			<a href="${pageContext.request.contextPath}/customerOrderList"><i class="fa fa-first-order" style="color: red"></i>Thông
 				tin đơn hàng</a>
 			|
-			<a href="${pageContext.request.contextPath}/logout">Đăng xuất</a>
-		</c:if>
-
-		<c:if test="${empty loginedUser }">
-			<a href="${pageContext.request.contextPath}/login">Đăng nhập</a>
-		</c:if>
-
-		<c:if test="${not empty cartOfCustomer }">
+			
+			<c:if test="${not empty cartOfCustomer }">
 			<a href="${pageContext.request.contextPath}/cartBook/viewCart"> <img
 				alt="ShoppingCart"
-				src="${pageContext.request.contextPath}/img/shopping-cart.png"
-				width="20">
+				width="20"><i class="fa fa-shopping-cart" style="color: red"></i>Gio hàng
 			</a>
+			</c:if>
+		
+			<a href="${pageContext.request.contextPath}/logout"><i class="fa fa-user-circle-o" style="color: red"></i>Đăng xuất</a>
 		</c:if>
-		<br> <br> Tìm sách &nbsp; <input name="Search"
-			onchange="activeAsLink('${pageContext.request.contextPath}/clientHome?keyword='+this.value)">
-	</div>
+		
+		<c:if test="${empty loginedUser }">
+			<a href="${pageContext.request.contextPath}/login"><i class="fa fa-user-circle-o" style="color: red"></i>Đăng nhập</a>
+		</c:if>
+		
+			</div>
 </div>

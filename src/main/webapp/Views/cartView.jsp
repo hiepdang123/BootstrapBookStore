@@ -40,7 +40,7 @@
 						onclick="minusValueAndUpdateCart('quantity${entry.value.selectedBook.bookId}');"
 						width="20" height="20"> <input type="text"
 						value="${entry.value.quantity }" size="2"
-						style="line-height: 20px"
+						style="line-height: 20px;width: 30px"
 						id="quantity${entry.value.selectedBook.bookId}"
 						onchange="validateValueAndUpdateCart(this,${entry.value.selectedBook.quantityInStock},${entry.value.selectedBook.bookId },${entry.value.selectedBook.price})">
 						<img alt="plus-img"
@@ -51,7 +51,7 @@
 								type="number" maxFractionDigits="0"
 								value="${entry.value.selectedBook.price * entry.value.quantity }" /></span>
 						<sup>đ</sup></td>
-					<td><button type="button"
+					<td><button class="red_button" type="button"
 							onclick="onClickRemoveBook('${entry.value.selectedBook.title}',${entry.value.selectedBook.bookId })">
 							Loại khỏi giỏ hàng</button></td>
 				</tr>

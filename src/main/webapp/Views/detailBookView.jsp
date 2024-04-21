@@ -19,7 +19,7 @@
 				<input type="hidden" name="bookId" value="${book.bookId }">
 				<table style="width: 50%;" border="1">
 					<tr>
-						<td width="25%">Tiêu đề</td>
+						<td>Tiêu đề</td>
 						<td>${book.title}</td>
 					</tr>
 					<tr>
@@ -47,20 +47,20 @@
 					<b>Số lượng có sẵn: <span>${book.quantityInStock}</span></b>
 					&nbsp;&nbsp; <img alt="minus-icon" src="img/icons-minus.png"
 						onclick="minusValue('quantity');" width="20"> <input
-						type="text" value="1" size="2" style="line-height: 20px;"
+						type="text" value="1" size="2" style="line-height: 20px;width: 50px"
 						id="quantity" name="quantityPurchased"
 						onkeyup="validateValue(this, ${book.quantityInStock});"> <img
 						alt="add-icon" src="img/icons-add.png"
 						onclick="plusValue('quantity',${book.quantityInStock})" width="20"
 						height="20"> &nbsp;&nbsp;&nbsp;
 					<c:if test="${not empty loginedUser }">
-						<button
+						<button class="red_button" class="green_button"
 							onclick="checkQuantityAndSubmit('quantity',${book.bookId},${bookquantityInStock })">Thêm
 							vào giỏ hàng</button>
 					</c:if>
 
 					<c:if test="${empty loginedUser }">
-						<button type="button" onclick="alert('Bạn cần đăng nhập!')">Thêm
+						<button class="red_button" type="button" onclick="alert('Bạn cần đăng nhập!')">Thêm
 							vào giỏ hàng</button>
 					</c:if>
 					&nbsp;&nbsp;&nbsp; <a href="clientHome">Tiếp tục xem sách</a>
