@@ -17,11 +17,11 @@
 	<div class="row">
 		<jsp:include page="_left_sidebar.jsp"></jsp:include>
 
-		<div class="rightcolumn">
-			<div class="block home_book" id="searchResult">
+		<div class="float-end col-md-8">
+			<div class="d-table w-100 mx-auto" id="searchResult">
 				<c:forEach items="${bookList}" var="book">
 
-					<div class="item_content">
+					<div class="shadow p-3 mb-5 bg-body rounded w-25 bg-secondary-subtle float-start mx-2">
 						<img id="bookImage" alt="" src="${book.imagePath}" height="200px"
 							style="max-width: 100%">
 						<p style="height: 30px; margin: 5px;">
@@ -34,12 +34,10 @@
 							<sup>đ</sup> &nbsp;&nbsp; <a
 								href="detailBook?bookId=${book.bookId}">Xem chi tiết</a>
 						</p>
-
-
 					</div>
 				</c:forEach>
 				<p style="color: red;">${errors}</p>
-				<div class="block" align="center">
+				<div class="d-table w-100" align="center">
 					<c:if test="${empty keyword }">
 						<div style="margin-top: 5px">
 							<!-- link previous chỉ xuất hiện khi trang hiện tại lớn hơn 1 -->
