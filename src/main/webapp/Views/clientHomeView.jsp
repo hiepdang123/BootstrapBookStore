@@ -14,14 +14,14 @@
 <body>
 	<jsp:include page="_header.jsp"></jsp:include>
 	<jsp:include page="_menu.jsp"></jsp:include>
-	<div class="row">
+	<div class="row container">
 		<jsp:include page="_left_sidebar.jsp"></jsp:include>
 
 		<div class="float-end col-md-8">
-			<div class="d-table w-100 mx-auto" id="searchResult">
+			<div class="d-table row mx-auto" id="searchResult">
 				<c:forEach items="${bookList}" var="book">
 
-					<div class="shadow p-3 mb-5 bg-body rounded w-25 bg-secondary-subtle float-start mx-2">
+					<div class="shadow p-3 mb-5 bg-body rounded col-md-3 bg-secondary-subtle float-start mx-2">
 						<img id="bookImage" alt="" src="${book.imagePath}" height="200px"
 							style="max-width: 100%">
 						<p style="height: 30px; margin: 5px;">
@@ -37,7 +37,7 @@
 					</div>
 				</c:forEach>
 				<p style="color: red;">${errors}</p>
-				<div class="d-table w-100" align="center">
+				<div class="d-table row" align="center">
 					<c:if test="${empty keyword }">
 						<div style="margin-top: 5px">
 							<!-- link previous chỉ xuất hiện khi trang hiện tại lớn hơn 1 -->
